@@ -20,9 +20,10 @@ class HashTable:
     Implement this.
     """
 
-    def __init__(self, capacity):
+    def __init__(self, capacity = MIN_CAPACITY):
         # Your code here
-
+        self.buckets = [None] * capacity
+        self.capacity = capacity
 
     def get_num_slots(self):
         """
@@ -35,7 +36,7 @@ class HashTable:
         Implement this.
         """
         # Your code here
-
+        return self.capacity
 
     def get_load_factor(self):
         """
@@ -45,7 +46,6 @@ class HashTable:
         """
         # Your code here
 
-
     def fnv1(self, key):
         """
         FNV-1 Hash, 64-bit
@@ -54,7 +54,28 @@ class HashTable:
         """
 
         # Your code here
+# Your code here
+        # source : https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function#FNV-1_hash
 
+    #     algorithm fnv-1 is
+    #     hash := FNV_offset_basis do
+    #     for each byte_of_data to be hashed
+    #       hash := hash × FNV_prime
+    #       hash := hash XOR byte_of_data
+    #     return hash 
+
+    #  XOR in python is ^ 
+    # source: https://python-reference.readthedocs.io/en/latest/docs/operators/bitwise_XOR.html 
+
+        FNV_offset_basis =  14695981039346656037
+        FNV_prime = 1099511628211
+
+        hash = FNV_offset_basis
+
+        for i in key.encode():
+            hash = hash * FNV_prime
+            hash = hash ^ i
+        return hash
 
     def djb2(self, key):
         """
@@ -62,8 +83,14 @@ class HashTable:
 
         Implement this, and/or FNV-1.
         """
-        # Your code here
+        
+        str_key = str(key).encode() # Cast the key to a string and get bytes
+         
+        hash_value = 5381  # Start from an arbitrary large prime
 
+        for i in key.encode():
+            hash = (hash * 33) + i
+        return hash
 
     def hash_index(self, key):
         """
@@ -71,7 +98,7 @@ class HashTable:
         between within the storage capacity of the hash table.
         """
         #return self.fnv1(key) % self.capacity
-        return self.djb2(key) % self.capacity
+        return self.djb2(key) % len(self.buckets)
 
     def put(self, key, value):
         """
@@ -82,6 +109,9 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        index = self.hash_index(key)
+        self.buckets[index] = HashTableEntry(key, value)
+         
 
 
     def delete(self, key):
@@ -93,7 +123,7 @@ class HashTable:
         Implement this.
         """
         # Your code here
-
+        self.put(key, None)
 
     def get(self, key):
         """
@@ -104,7 +134,11 @@ class HashTable:
         Implement this.
         """
         # Your code here
-
+        index = self.hash_index(key)
+        if self.buckets[index] is not None:
+            return self.buckets[index].value
+        else:
+            return None
 
     def resize(self, new_capacity):
         """
