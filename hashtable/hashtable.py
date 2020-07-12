@@ -1,4 +1,4 @@
-class HashTableEntry:
+class HashTableEntry: # Like class Node:
     """
     Linked List hash table key/value pair
     """
@@ -20,10 +20,15 @@ class HashTable:
     Implement this.
     """
 
-    def __init__(self, capacity = MIN_CAPACITY):
+    def __init__(self, capacity):
         # Your code here
-        self.buckets = [None] * capacity
-        self.capacity = capacity
+        self.min_capacity = MIN_CAPACITY
+        if capacity > self.min_capacity:
+            self.capacity = capacity
+        else:
+            self.capacity = self.min_capacity
+        self.bucket = [None] * self.capacity
+        self.count = 0
 
     def get_num_slots(self):
         """
@@ -45,7 +50,7 @@ class HashTable:
         Implement this.
         """
         # Your code here
-
+        return self.count / self.capacity
     def fnv1(self, key):
         """
         FNV-1 Hash, 64-bit
@@ -54,18 +59,18 @@ class HashTable:
         """
 
         # Your code here
-# Your code here
+
         # source : https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function#FNV-1_hash
 
-    #     algorithm fnv-1 is
-    #     hash := FNV_offset_basis do
-    #     for each byte_of_data to be hashed
-    #       hash := hash × FNV_prime
-    #       hash := hash XOR byte_of_data
-    #     return hash 
+        #     algorithm fnv-1 is
+        #     hash := FNV_offset_basis do
+        #     for each byte_of_data to be hashed
+        #       hash := hash × FNV_prime
+        #       hash := hash XOR byte_of_data
+        #     return hash 
 
-    #  XOR in python is ^ 
-    # source: https://python-reference.readthedocs.io/en/latest/docs/operators/bitwise_XOR.html 
+        #  XOR in python is ^ 
+        # source: https://python-reference.readthedocs.io/en/latest/docs/operators/bitwise_XOR.html 
 
         FNV_offset_basis =  14695981039346656037
         FNV_prime = 1099511628211
@@ -89,16 +94,16 @@ class HashTable:
         hash_value = 5381  # Start from an arbitrary large prime
 
         for i in key.encode():
-            hash = (hash * 33) + i
-        return hash
+            hash_value = (hash_value * 33) + i
+        return hash_value
 
     def hash_index(self, key):
         """
         Take an arbitrary key and return a valid integer index
         between within the storage capacity of the hash table.
         """
-        #return self.fnv1(key) % self.capacity
-        return self.djb2(key) % len(self.buckets)
+        return self.fnv1(key) % self.capacity
+        # return self.djb2(key) % len(self.capacity)
 
     def put(self, key, value):
         """
@@ -110,8 +115,22 @@ class HashTable:
         """
         # Your code here
         index = self.hash_index(key)
-        self.buckets[index] = HashTableEntry(key, value)
-         
+        if self.bucket[index] == None:
+            self.bucket[index] = HashTableEntry(key, value)
+            self.count += 1
+        else:
+            current = self.bucket[index]
+            while current.next != None and current.key != key:
+                current = current.next
+            if current.key == key:
+                current.value = value
+            else:
+                new_entry = HashTableEntry(key, value)
+                new_entry.next  = self.bucket[index]
+                self.bucket[index] = new_entry
+                self.count +=1
+        if self.get_load_factor() > .7:
+            self.resize(self.capacity * 2)
 
 
     def delete(self, key):
@@ -123,7 +142,36 @@ class HashTable:
         Implement this.
         """
         # Your code here
-        self.put(key, None)
+        index = self.hash_index(key)
+        if self.bucket[index].key == key:
+            if self.bucket[index].next == None:
+                self.bucket[index] = None 
+                self.count -= 1
+            else:
+                new_head = self.bucket[index].next
+                self.bucket[index].next = None
+                self.bucket[index] = new_head
+                self.count -= 1
+        else:
+            if self.bucket[index] == None:
+                return None
+            else:
+                current = self.bucket[index]
+                previous = None
+                while current.next is not None and current.key != key:
+                    previous = current
+                    current = current.next
+                if current.key == key:
+                    previous.next = current.next
+                    self.count -= 1
+                    return current.value
+                else:
+                    return None
+        if self.get_load_factor() < .2:
+            if self.capacity/2 > 8:
+                self.resize(self.capacity // 2)
+            elif self.capacity > 8:
+                self.resize(8)
 
     def get(self, key):
         """
@@ -135,10 +183,18 @@ class HashTable:
         """
         # Your code here
         index = self.hash_index(key)
-        if self.buckets[index] is not None:
-            return self.buckets[index].value
-        else:
+        if self.bucket[index] is not None and self.bucket[index].key == key:
+            return self.bucket[index].value
+        elif self.bucket[index]is None:
             return None
+        else:
+            current = self.bucket[index]
+            while current.next != None and current.key != key:
+                current = self.bucket[index].next
+            if current == None:
+                return None
+            else: 
+                return current.value
 
     def resize(self, new_capacity):
         """
@@ -148,7 +204,13 @@ class HashTable:
         Implement this.
         """
         # Your code here
-
+        prev_table = self.bucket[:]
+        self.capacity = new_capacity
+        self.bucket = [None] * new_capacity
+        for i in range(len(prev_table)):
+            if prev_table[i] is not None:
+                current = prev_table[i]
+                self.put(current.key, current.value)
 
 
 if __name__ == "__main__":
@@ -185,3 +247,6 @@ if __name__ == "__main__":
         print(ht.get(f"line_{i}"))
 
     print("")
+
+# my_hash = HashTableEntry('key', 1)
+# my_hash.get_num_slots()
