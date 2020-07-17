@@ -1,12 +1,15 @@
-class HashTableEntry: # Like class Node:
+class HashTableEntry:  # Like class Node:
     """
     Linked List hash table key/value pair
     """
+
     def __init__(self, key, value):
         self.key = key
         self.value = value
         self.next = None
 
+    def __repr__(self):
+        return f'key: {self.key}, value:{self.value}'
 
 # Hash table can't have fewer than this many slots
 MIN_CAPACITY = 8
@@ -30,6 +33,10 @@ class HashTable:
         self.bucket = [None] * self.capacity
         self.count = 0
 
+    def print_it(self):
+        for i in self.bucket:
+            print(i)
+
     def get_num_slots(self):
         """
         Return the length of the list you're using to hold the hash
@@ -51,6 +58,7 @@ class HashTable:
         """
         # Your code here
         return self.count / self.capacity
+
     def fnv1(self, key):
         """
         FNV-1 Hash, 64-bit
@@ -67,12 +75,12 @@ class HashTable:
         #     for each byte_of_data to be hashed
         #       hash := hash × FNV_prime
         #       hash := hash XOR byte_of_data
-        #     return hash 
+        #     return hash
 
-        #  XOR in python is ^ 
-        # source: https://python-reference.readthedocs.io/en/latest/docs/operators/bitwise_XOR.html 
+        #  XOR in python is ^
+        # source: https://python-reference.readthedocs.io/en/latest/docs/operators/bitwise_XOR.html
 
-        FNV_offset_basis =  14695981039346656037
+        FNV_offset_basis = 14695981039346656037
         FNV_prime = 1099511628211
 
         hash = FNV_offset_basis
@@ -88,9 +96,9 @@ class HashTable:
 
         Implement this, and/or FNV-1.
         """
-        
-        str_key = str(key).encode() # Cast the key to a string and get bytes
-         
+
+        str_key = str(key).encode()  # Cast the key to a string and get bytes
+
         hash_value = 5381  # Start from an arbitrary large prime
 
         for i in key.encode():
@@ -126,12 +134,11 @@ class HashTable:
                 current.value = value
             else:
                 new_entry = HashTableEntry(key, value)
-                new_entry.next  = self.bucket[index]
+                new_entry.next = self.bucket[index]
                 self.bucket[index] = new_entry
-                self.count +=1
+                self.count += 1
         if self.get_load_factor() > .7:
             self.resize(self.capacity * 2)
-
 
     def delete(self, key):
         """
@@ -145,7 +152,7 @@ class HashTable:
         index = self.hash_index(key)
         if self.bucket[index].key == key:
             if self.bucket[index].next == None:
-                self.bucket[index] = None 
+                self.bucket[index] = None
                 self.count -= 1
             else:
                 new_head = self.bucket[index].next
@@ -167,6 +174,7 @@ class HashTable:
                     return current.value
                 else:
                     return None
+                    
         if self.get_load_factor() < .2:
             if self.capacity/2 > 8:
                 self.resize(self.capacity // 2)
@@ -193,7 +201,7 @@ class HashTable:
                 current = self.bucket[index].next
             if current == None:
                 return None
-            else: 
+            else:
                 return current.value
 
     def resize(self, new_capacity):
@@ -229,24 +237,38 @@ if __name__ == "__main__":
     ht.put("line_11", "So rested he by the Tumtum tree")
     ht.put("line_12", "And stood awhile in thought.")
 
-    print("")
+    # print("")
 
     # Test storing beyond capacity
-    for i in range(1, 13):
-        print(ht.get(f"line_{i}"))
+    # for i in range(1, 13):
+    #     print(ht.get(f"line_{i}"))
 
-    # Test resizing
-    old_capacity = ht.get_num_slots()
-    ht.resize(ht.capacity * 2)
-    new_capacity = ht.get_num_slots()
+    # # Test resizing
+    # old_capacity = ht.get_num_slots()
+    # ht.resize(ht.capacity * 2)
+    # new_capacity = ht.get_num_slots()
 
-    print(f"\nResized from {old_capacity} to {new_capacity}.\n")
+    # print(f"\nResized from {old_capacity} to {new_capacity}.\n")
 
     # Test if data intact after resizing
-    for i in range(1, 13):
-        print(ht.get(f"line_{i}"))
+    # for i in range(1, 13):
+    #     print(ht.get(f"line_{i}"))
 
-    print("")
+    # print("")
 
-# my_hash = HashTableEntry('key', 1)
-# my_hash.get_num_slots()
+my_hash = HashTable(10)
+my_hash.put('a', 23)
+my_hash.put('b', 25)
+my_hash.put('c', 42)
+my_hash.put('hat', 'black')
+my_hash.put('cat', 'gray')
+my_hash.put('car', 'camaro')
+my_hash.put('plane', 'wings')
+my_hash.put('laptop', 3)
+my_hash.put('yard', '20x15')
+my_hash.put('shoes', 4)
+my_hash.put('stair_steps', 20)
+
+print(my_hash.get('b'))
+print(my_hash.bucket)
+print(my_hash.print_it())
