@@ -1,0 +1,4 @@
+PIPENV_IGNORE_VIRTUALENVS=1
+pipenv --rm
+pipenv install -e .
+pipenv_venv="$(PIPENV_IGNORE_VIRTUALENVS=1 pipenv --venv)" && rm -rf "${pipenv_venv}"
