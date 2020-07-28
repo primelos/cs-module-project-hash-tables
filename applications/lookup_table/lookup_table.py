@@ -5,11 +5,11 @@ import random
 
 def slowfun_too_slow(x, y):
     v = math.pow(x, y)
-    print('1', v)
+    # print('1', v)
     v = math.factorial(v)
-    print('2', v)
+    # print('2', v)
     v //= (x + y)
-    print('3', v)
+    # print('3', v)
     v %= 982451653
 
     return v
@@ -31,7 +31,7 @@ def slowfun(x, y):
         v = math.factorial(v)
         v //= (x + y)
         v %= 982451653
-        cache[key] = v
+        cache[key] = v 
     return cache[key]
 
 # Do not modify below this line!

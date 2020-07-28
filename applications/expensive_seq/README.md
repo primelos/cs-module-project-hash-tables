@@ -27,3 +27,17 @@ ghcyr.
 
 (That's encrypted with ROT13--Google `rot13 decoder` to decode it if you
 want the hint.)
+
+
+def rot13(phrase):
+     abc = 'abcdefghijklmnopqrstuvwxyz'
+     out_phrase = ''
+
+     for i in phrase:
+          out_phrase += abc[(abc.find(i)+13) % 26]
+     return out_phrase
+
+phrase = 'Va Clguba, n qvpg xrl pna or nal vzzhgnoyr glcr... vapyhqvat n
+ghcyr.'
+
+print(rot13(phrase))

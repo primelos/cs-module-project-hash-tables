@@ -99,7 +99,7 @@ class HashTable:
 
         str_key = str(key).encode()  # Cast the key to a string and get bytes
 
-        hash_value = 5381  # Start from an arbitrary large prime
+        str_key = str(key).encode()  # Start from an arbitrary large prime
 
         for i in key.encode():
             hash_value = (hash_value * 33) + i
@@ -143,9 +143,7 @@ class HashTable:
     def delete(self, key):
         """
         Remove the value stored with the given key.
-
         Print a warning if the key is not found.
-
         Implement this.
         """
         # Your code here
@@ -161,6 +159,7 @@ class HashTable:
                 self.count -= 1
         else:
             if self.bucket[index] == None:
+                print(f'Key {key} not found!')
                 return None
             else:
                 current = self.bucket[index]
@@ -271,4 +270,6 @@ my_hash.put('stair_steps', 20)
 
 print(my_hash.get('b'))
 print(my_hash.bucket)
-print(my_hash.print_it())
+# print(my_hash.print_it())
+print(my_hash.delete('hat'))
+print(my_hash.bucket)
